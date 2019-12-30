@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head th:replace="fragments/layout :: head">
+        <meta charset="UTF-8" />
+        <title>Hello world</title>
+    </head>
+    <body>
+        <nav th:replace="fragments/layout :: nav(active='followers', loggedInUser=${loggedInUser})"></nav>
+        <a href="/" class="ml-2">&lt;- back to all posts</a>
+        <div class="container">
+            <div class="row">
+                <div class="col align-self-center">
+                    <h1 class="text-center">FaceGram</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col align-self-center">
+                    <h2 class="text-center" th:text="'Posted by ' + ${post.user.name} + ' at ' + ${#dates.format(post.postedAt, 'dd.MM.yyyy')}"></h2>
+                </div>
+            </div>
+            <div class="card mt-3">
+                <div class="card-body">
+                    <div class="row m-2">
+                        <strong><a class="text-reset" th:text="${post.user.name}" th:href="'/user/' + ${post.user.id}"></a></strong>
+                        <strong><p class="ml-2" th:text="${#dates.format(post.postedAt, 'dd.MM.yyyy')}"></p></strong>
+                    </div>
+                    <div th:utext="${post.content}"></div>
+                    <div class="row justify-content-end">
+                        <p th:id="'likes-' + ${post.id}" class="text-right mr-2 mt-2" th:text="'Likes: ' + ${#lists.size(post.likes)}"></p>
+                        <p class="text-left ml-2 mr-2 mt-2" th:text="'Comments: ' + ${#lists.size(post.comments)}"></p>
+                        <button th:id="'likeBtn-' + ${post.id}" 
+                            class="btn js-like-btn mr-2" 
+                            th:classappend="${#lists.contains(post.likes, loggedInUser)} ? 'btn-light' : 'btn-primary'">
+                            Like
+                        </button>
+                    </div>
+                </div>  
+            </div>
+            <div th:if="${loggedInUser != null}" class="row mt-3">
+                <div class="col align-self-center">
+                    <h4 class="text-center">Add a comment</h4>
+                    <form th:action="@{'/comment/' + ${loggedInUser.username} + '/' + ${post.id}}" method="POST">
+                        <div class="form-group align-self-center">
+                            <textarea wrap="physical" class="form-control col-12" name="content"></textarea>
+                        </div>
+                        <div class="align-self-right">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col align-self-center">
+                    <h4 class="text-center">Comments</h4>
+                </div>
+            </div>
+            <div th:each="comment: ${comments}">
+                <div class="card mt-3">
+                <div class="card-body">
+                    <div class="row m-2">
+                        <strong><a class="text-reset" th:text="${comment.user.name}" th:href="'/user/' + ${comment.user.id}"></a></strong>
+                        <strong><p class="ml-2" th:text="${#dates.format(comment.postedAt, 'dd.MM.yyyy')}"></p></strong>
+                    </div>
+                    <div th:text="${comment.content}"></div>
+                    <div class="row justify-content-end">
+                        
+                    </div>
+                </div>  
+            </div>
+            </div>
+        </div>
+        <footer th:replace="fragments/layout :: footer"></footer>
+    </body>
+</html>

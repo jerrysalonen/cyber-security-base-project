@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head th:replace="fragments/layout :: head">
+        <meta charset="UTF-8" />
+        <title>Hello world</title>
+    </head>
+    <body>
+        <nav th:replace="fragments/layout :: nav(active='followers', loggedInUser=${loggedInUser})"></nav>
+        <a th:href="'/user/' + ${loggedInUser.id}" class="ml-2">&lt;- back to your profile</a>
+        <div class="container">
+            <div class="row">
+                <div class="col align-self-center">
+                    <h1 class="text-center">FaceGram</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col align-self-center">
+                    <h2 class="text-center">Your followers</h2>
+                </div>
+            </div>
+            <div th:each="follower: ${followers}">
+                <h4 class="text-center"><a th:text="${follower.user.name + ' - ' + #dates.format(follower.followedAt, 'dd.MM.yyyy')}" th:href="'/user/' + ${follower.user.id}"></a></h4>
+            </div>
+            <div th:if="${#lists.size(followers) == 0}" class="card-body">
+                <p class="text-center">No followers yet</p>
+            </div>
+        </div>
+        <footer th:replace="fragments/layout :: footer"></footer>
+    </body>
+</html>

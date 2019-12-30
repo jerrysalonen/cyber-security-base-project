@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="fragments/layout :: head">
+        <meta charset="UTF-8" />
+        <title>Hello world</title>
+    </head>
+    <body>
+        <nav th:replace="fragments/layout :: nav(active='index', loggedInUser=${loggedInUser})"></nav>
+        <div class="container">
+            <div class="row">
+                <div class="col align-self-center">
+                    <h1 class="text-center">FaceGram</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div th:if="${loggedInUser != null}" class="col align-self-center">
+                    <h2 class="text-center">Your feed</h2>
+                </div>
+                <div th:if="${loggedInUser == null}" class="col align-self-center">
+                    <h2 class="text-center">
+                        Please <a href="/login">login</a> or <a href="/signup">sign up</a>.
+                    </h2>
+                </div>
+            </div>
+            <div th:if="${loggedInUser != null}" class="row mt-3">
+                <div class="col align-self-center">
+                    <h4 class="text-center">Add a post</h4>
+                    <form th:action="@{/post}" method="POST">
+                        <div class="form-group align-self-center">
+                            <textarea wrap="physical" class="form-control col-12" name="content"></textarea>
+                        </div>
+                        <div class="align-self-right">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div th:each="post: ${posts}">
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <div class="row m-2">
+                            <strong><a class="text-reset" th:text="${post.user.name}" th:href="'/user/' + ${post.user.id}"></a></strong>
+                            <strong><p class="ml-2" th:text="${#dates.format(post.postedAt, 'dd.MM.yyyy')}"></p></strong>
+                        </div>
+                        <a class="text-right mr-2" th:href="'/post/' + ${post.id}">Go to post &gt;</a>
+                        <div class="mt-2" th:text="${post.content}"></div>
+                        <div class="row justify-content-end">
+                            <p th:id="'likes-' + ${post.id}" class="text-right mr-2 mt-2" th:text="'Likes: ' + ${#lists.size(post.likes)}"></p>
+                            <p class="text-left ml-2 mr-2 mt-2" th:text="'Comments: ' + ${#lists.size(post.comments)}"></p>
+                            <button th:id="'likeBtn-' + ${post.id}" 
+                                class="btn js-like-btn mr-2" 
+                                th:classappend="${#lists.contains(post.likes, loggedInUser)} ? 'btn-light' : 'btn-primary'">
+                                Like
+                            </button>
+                        </div>
+                    </div>  
+                </div>
+                
+            </div>
+        </div>
+
+        <footer th:replace="fragments/layout :: footer"></footer>
+
+    </body>
+</html>

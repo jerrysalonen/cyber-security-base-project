@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head th:replace="fragments/layout :: head">
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <nav th:replace="fragments/layout :: nav(active='signup', loggedInUser=${loggedInUser})"></nav>
+        <form class="container col-6" th:action="@{/signup}" th:object="${user}" method="POST">
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" class="form-control" name="username" th:field="*{username}" aria-describedby="usernameHelp" th:placeholder="username"/>
+                <small id="usernameHelp" class="form-text text-muted">4-15 characters, used for logging in</small>
+                <section th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="text-danger">Error</section>
+                
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" name="password" th:field="*{password}" th:placeholder="Password"/>
+                <section th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="text-danger">Error</section>
+            </div>
+
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="name" class="form-control" name="name" th:field="*{name}" th:placeholder="Name"/>
+                <section th:if="${#fields.hasErrors('name')}" class="text-danger">must be between 18 and 100</section>
+            </div>
+
+            <button type="submit" class="btn btn-info mb-4">Sign up!</button>
+        </form>
+        <footer th:replace="fragments/layout :: footer"></footer>
+    </body>
+</html>

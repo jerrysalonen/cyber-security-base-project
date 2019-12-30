@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+    <head th:fragment="head">
+        <title>FaceGram</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"/>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light" th:fragment="nav(active, loggedInUser)">
+            <a class="navbar-brand" href="/">FaceGram</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li th:classappend="${active} == 'index' ? 'active' : ''" class="nav-item">
+                        <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li th:if="${loggedInUser != null}" th:classappend="${active} == 'mypage' ? 'active' : ''" class="nav-item">
+                        <a class="nav-link" th:href="'/user/' + ${loggedInUser.id}">My page <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li th:if="${loggedInUser == null}" th:classappend="${active} == 'mypage' ? 'active' : ''" class="nav-item">
+                        <a class="nav-link" href="/login">Login <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li th:if="${loggedInUser == null}" th:classappend="${active} == 'mypage' ? 'active' : ''" class="nav-item">
+                        <a class="nav-link" href="/signup">Sign up <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li th:if="${loggedInUser != null}" th:classappend="${active} == 'mypage' ? 'active' : ''" class="nav-item">
+                        <a class="nav-link" href="/followers">Followers <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li th:if="${loggedInUser != null}" th:classappend="${active} == 'mypage' ? 'active' : ''" class="nav-item">
+                        <a class="nav-link" href="/followees">Following <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li th:if="${loggedInUser != null}" th:classappend="${active} == 'mypage' ? 'active' : ''" class="nav-item">
+                        <a class="nav-link" href="/logout">Log out <span class="sr-only">(current)</span></a>
+                    </li>
+                </ul>
+                <div class="form-inline my-2 my-lg-0">
+                    <input class="form-control mr-sm-2 js-search-val" type="search" placeholder="Search for users" aria-label="Search">
+                    <button class="btn btn-outline-success my-2 my-sm-0 js-search-btn" type="submit">Search</button>
+                </div>
+            </div>
+        </nav>
+        
+        <footer th:fragment="footer" class="row-12 p-4">
+            <div class="col-5">
+                <p>&copy; Jerry Salonen 2019</p>
+            </div>
+            <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+            <script>
+                $(function() {
+                    $('.js-search-btn').click(function() {
+                        let search = $('.js-search-val').val();
+                        window.location = "/search?name=" + search;
+                    });
+                    
+                    $(".js-search-val").keyup(function(event) {
+                        if (event.key === "Enter") {
+                            $('.js-search-btn').click();
+                        }
+                    });
+                    
+                    $('.js-like-btn').click(async function(e) {
+                    
+                        //let csrfToken = $("meta[name='_csrf']").attr("content");
+                    
+                        let id = e.target.id.split('-')[1];
+
+                        const res = await fetch('/post/' + id + '/like', {
+                            method: 'POST',
+                            headers: new Headers({
+                                'Content-Type': 'application/json',
+                                //'X-CSRF-TOKEN': csrfToken
+                            }),
+                            body: {}
+                        });
+
+                        let resJSON = await res.json();
+                        let button = $('#likeBtn-' + id);
+                        let likes = $('#likes-' + id);
+                        let likeNum = parseInt(likes.text().split(" ")[1]);
+
+                        if (resJSON.likeStatus === "unlike") {
+                            button.removeClass("btn-light");
+                            button.addClass("btn-primary");
+                            likeNum -= 1;
+                            likes.text('Likes: ' + likeNum);
+                        } else if (resJSON.likeStatus === "like") {
+                            button.removeClass("btn-primary");
+                            button.addClass("btn-light");
+                            likeNum += 1;
+                            likes.text('Likes: ' + likeNum);
+                        }
+                    });
+                    
+                    $('.js-follow-btn').click(async function(e) {
+                    
+                        //let csrfToken = $("meta[name='_csrf']").attr("content");
+                    
+                        let id = e.target.id.split('-')[1];
+
+                        const res = await fetch('/user/' + id + '/follow', {
+                            method: 'POST',
+                            headers: new Headers({
+                                'Content-Type': 'application/json',
+                                //'X-CSRF-TOKEN': csrfToken
+                            }),
+                            body: {}
+                        });
+                        console.log(await res);
+                        let resJSON = await res.json();
+                        let button = $('.js-follow-btn');
+                        let followers = parseInt($('.follower-text').text().split(' ')[1]);
+
+                        if (resJSON.followStatus === "unfollow") {
+                            button.removeClass("btn-light");
+                            button.addClass("btn-primary");
+                            button.text("Follow");
+                            followers--;
+                            $('.follower-text').text('Followers: ' + followers);
+                        } else if (resJSON.followStatus === "follow") {
+                            button.removeClass("btn-primary");
+                            button.addClass("btn-light");
+                            button.text("Following");
+                            followers++;
+                            $('.follower-text').text('Followers: ' + followers);
+                        }
+                    });
+                });
+            </script>
+        </footer>
+    </body>
+</html>

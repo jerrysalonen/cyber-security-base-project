@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head th:replace="fragments/layout :: head">
+        <meta charset="UTF-8" />
+        <title>Hello world</title>
+    </head>
+    <body>
+        <nav th:replace="fragments/layout :: nav(active='followers', loggedInUser=${loggedInUser})"></nav>
+        <a href="/" class="ml-2">&lt;- back to all posts</a>
+        <div class="container">
+            <div class="row">
+                <div class="col align-self-center">
+                    <h1 class="text-center">FaceGram</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col align-self-center">
+                    <h2 class="text-center" th:text="'Posted by ' + ${post.user.name} + ' at ' + ${#dates.format(post.postedAt, 'dd.MM.yyyy')}"></h2>
+                </div>
+            </div>
+            <div class="card mt-3">
+                <div class="card-body" th:for="image: ${images}">
+                    <div class="row m-2">
+                        <strong><a class="text-reset" th:text="${image.user.name}" th:href="'/user/' + ${image.user.id}"></a></strong>
+                        <strong><p class="ml-2" th:text="${#dates.format(image.postedAt, 'dd.MM.yyyy')}"></p></strong>
+                    </div>
+                    <img alt="Image" th:src="@{image/userprofile}" width="250" height="250"/>
+                    <div class="row justify-content-end">
+                        
+                    </div>
+                </div>  
+            </div>
+
+
+        </div>
+        <footer th:replace="fragments/layout :: footer"></footer>
+    </body>
+</html>
